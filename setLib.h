@@ -20,6 +20,7 @@ typedef struct set {
 	Node** data; // array of pointers to Nodes
 	int size; // maximum number of elements in set (capacity)
 	int nOfElements; // number of elements currently stored in a set
+	int step;
 } Set;
 
 // new set initialization
@@ -29,4 +30,19 @@ Set *newSet(const int size);
 void addElement(Set *set, const int n); 
 
 // printing a set
-void printSet (const Set *set);
+void printSet(const Set *set);
+
+// test whether an element is in a set
+int isElement(const int n, const Set *set);
+
+// function tests whether one set is a subset of another
+int isSubset(const Set *A, const Set *B);
+
+// function tests two sets for equality
+// it is possible to combine functions isSubset and isEqual into one function without any
+// loss of functionality, but the general solution might become slower and the code
+// using it less explicit
+int isEqual(const Set *A, const Set *B);
+
+// populating a set with n arbitrary integers in the range [min..max)
+void populateSet(Set *set, const int n, const int min, const int max);

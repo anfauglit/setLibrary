@@ -5,26 +5,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include "setLib.h"
 
 int main (int argc, char **argv) {
-	Set *set = newSet(30);
-
-	for (int i = 0; i < 10; ++i) {
-		addElement(set, i * 20);
-	}
-
-	printf("%i\n", set->nOfElements);	
-
-	addElement(set, 60);
-	addElement(set, 40);
-	addElement(set, 20);
 	
-	printf("%i\n", set->nOfElements);	
+	srand(time(NULL));
 
-	printSet(set);
+	Set *setA = newSet(30);
+	Set *setB = newSet(30);
 	
+	populateSet(setA, 3, 0, 5);
+	populateSet(setB, 5, 0, 5);
+	printSet(setA);
+	printf("\n");
+	printSet(setB);
+	printf("\n");
+
+	printf("Is setA equal to setB?: %i\n", isEqual(setA, setB));
+	printf("Is setA a subset of setB?: %i\n", isSubset(setA, setB));
+
 	return 0;
 }
 
