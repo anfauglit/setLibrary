@@ -16,15 +16,17 @@ int main (int argc, char **argv) {
 	Set *setA = newSet(30);
 	Set *setB = newSet(30);
 	
-	populateSet(setA, 3, 0, 5);
-	populateSet(setB, 5, 0, 5);
+	populateSet(setA, 10, 0, 20);
+	addPair(setA, 10, 10);
+	populateSet(setB, 10, 0, 20);
+	addInt(setB, 200);
 	printSet(setA);
 	printf("\n");
 	printSet(setB);
 	printf("\n");
 
-	printf("Is setA equal to setB?: %i\n", isEqual(setA, setB));
-	printf("Is setA a subset of setB?: %i\n", isSubset(setA, setB));
+//	printf("Is setA equal to setB?: %i\n", isEqual(setA, setB));
+//	printf("Is setA a subset of setB?: %i\n", isSubset(setA, setB));
 
 	return 0;
 }

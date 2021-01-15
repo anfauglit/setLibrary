@@ -11,12 +11,26 @@
 // hash table for implementing set will be using open addressing scheme
 // that's the most convient approch for a simple library IMHO
 
+// define type with set elements types
+typedef enum {
+	int_t,
+	opair_t	
+} memberType;
+
 typedef struct node {
-	int key;
-	int value;
+	memberType type;	
+	int key; //hash key
+	union {
+		int ival;
+		struct {
+			int x;
+			int y;
+		} pair;
+	};
 } Node;
 
 typedef struct set {
+	memberType type; // type of elements in a set
 	Node** data; // array of pointers to Nodes
 	int size; // maximum number of elements in set (capacity)
 	int nOfElements; // number of elements currently stored in a set
@@ -27,7 +41,12 @@ typedef struct set {
 Set *newSet(const int size); 
 
 // adding a single element to a set
-void addElement(Set *set, const int n); 
+//void addElement(Set *set, const int n); 
+
+void addInt(Set *set, const int n);
+
+
+void addPair(Set *set, const int x, const int y);
 
 // printing a set
 void printSet(const Set *set);

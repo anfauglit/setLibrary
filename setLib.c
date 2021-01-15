@@ -7,11 +7,12 @@
 
 /*	TODO
 	* Add a linked list to hash table for fast iteration over
-	* Random set generator
 	* Destructors for sets
 	* hash table resizing
 	* add tests when adding elements (might not needed if there will automatic resizing of a set)
 	* add memory allocation checks
+	* maybe stick to sets with only one type of data but implementing set of sets would be great and beneficial
+	* function comparing 2 nodes with the data of the same type
 */
 
 // generating integers in the interval [min..max)
@@ -23,7 +24,39 @@ static int hashValue(const int n, const int tableSize) {
 	return n % tableSize;
 }
 
-static Node *newNode(int key, int value) {
+static int hashValuePair(const int x, const int y, const unsigned tableSize) {
+	// Cantor pairing function for hashing ordered pairs
+	return ((x + y) * (x + y + 1) / 2 + y) % tableSize;
+}
+
+
+static Node *newNode(memberType type) {
+	Node *node = malloc(sizeof(*node));
+
+	node->type = type;
+
+	return node;
+}
+
+static Node *newInt(const int n) {
+	Node *node = newNode(int_t);
+
+	node->ival = n;
+
+	return node;
+}
+
+static Node *newPair(const int x, const int y) {
+	Node *node = newNode(opair_t);
+
+	node->pair.x = x;
+	node->pair.y = y;
+
+	return node;
+}
+
+/*
+static Node *newNode(int key, memberType type, int value) {
 	Node *node = malloc(sizeof(*node));
 
 	node->value = value;
@@ -31,6 +64,7 @@ static Node *newNode(int key, int value) {
 
 	return node;
 }
+*/
 
 Set *newSet(const int size) {
 	Set *set = malloc(sizeof(*set));
@@ -38,7 +72,7 @@ Set *newSet(const int size) {
 	set->data = calloc(size, sizeof(*set->data));
 	set->size = size;
 	set->nOfElements = 0;
-	set->step = 2;
+	set->step = 1;
 
 	return set;
 }
@@ -51,29 +85,48 @@ void populateSet(Set *set, const int n, const int min, const int max) {
 	}
 
 	for (int i = 0; i < n; ++i) {
-		addElement(set, getRndInt(min, max));
+		addInt(set, getRndInt(min, max));
 	}
 }
 
-void addElement(Set *set, const int n) {
+void addInt(Set *set, const int n) {
 
 	int hash = hashValue(n, set->size);
 
 	while (set->data[hash] != NULL) {
-		if (set->data[hash]->value == n)
+		if (set->data[hash]->ival == n)
 			return;
 		hash = (hash + set->step) % set->size;
 	}
+	
+	Node* node = newInt(n);
+	set->data[hash] = node;
+	set->nOfElements++;
+}
 
-	Node* node = newNode(n, n);
+void addPair(Set *set, const int x, const int y) {
+
+	int hash = hashValuePair(x, y, set->size);
+
+	while (set->data[hash] != NULL) {
+		if (set->data[hash]->pair.x == x && set->data[hash]->pair.y == y)
+			return;
+		hash = (hash + set->step) % set->size;
+	}
+	
+	Node* node = newPair(x, y);
 	set->data[hash] = node;
 	set->nOfElements++;
 }
 
 void printSet (const Set *set) {
 	for (int i = 0; i < set->size; ++i) {
-		if (set->data[i] != NULL)
-			printf("%i ", set->data[i]->value);
+		if (set->data[i] != NULL) {
+			if (set->data[i]->type == int_t)
+				printf("%i ", set->data[i]->ival);
+			else if (set->data[i]->type == opair_t)
+				printf("(%i,%i) ", set->data[i]->pair.x, set->data[i]->pair.y);
+		}
 	}
 }
 
@@ -81,7 +134,7 @@ int isElement(const int n, const Set *set) {
 	int hash = hashValue(n, set->size);
 
 	while (set->data[hash] != NULL) {
-		if (set->data[hash]->value == n)
+		if (set->data[hash]->ival == n)
 			return 1;
 		hash = (hash + set->step) % set->size;
 	}
@@ -97,7 +150,7 @@ int isSubset(const Set *setA, const Set *setB) {
 	for (int i = 0; i < setA->size; ++i) {
 		if (setA->data[i] == NULL)
 			continue;
-		else if (!isElement(setA->data[i]->value, setB))
+		else if (!isElement(setA->data[i]->ival, setB))
 			return 0;
 	}
 
@@ -119,7 +172,7 @@ int isEqual(const Set *setA, const Set *setB) {
 	for (int i = 0; i < setA->size; ++i) {
 		if (setA->data[i] == NULL)
 			continue;
-		else if (!isElement(setA->data[i]->value, setB))
+		else if (!isElement(setA->data[i]->ival, setB))
 			return 0;
 		else
 			--n;
